@@ -9,18 +9,24 @@ export default async function VoicePage({
 }) {
   const { token } = await params
 
+  // Use anon key for reads (RLS allows it), service role only for writes in API routes
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
   )
 
-  const { data: project } = await supabase
+  const { data: project, error } = await supabase
     .from('projects')
     .select('id, name, slug, language')
     .eq('token', token)
     .single()
 
   if (!project) {
+    const hasUrl = !!process.env.NEXT_PUBLIC_SUPABASE_URL
+    const hasKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    const keyPreview = process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 10) || 'MISSING'
+    console.error('Project lookup failed:', { token, error, hasUrl, hasKey, keyPreview })
+
     return (
       <div className="min-h-dvh flex flex-col items-center justify-center gap-4 px-6" dir="rtl">
         <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
@@ -29,6 +35,7 @@ export default async function VoicePage({
           </svg>
         </div>
         <p className="text-gray-500 text-lg">הקישור לא תקין</p>
+        <p className="text-xs text-gray-300 mt-4">{JSON.stringify({ error: error?.message, hasUrl, hasKey, keyPreview })}</p>
       </div>
     )
   }
