@@ -2,17 +2,17 @@ import { createClient } from '@supabase/supabase-js'
 import ProjectHeader from '@/components/ProjectHeader'
 import VoiceRecorder from '@/components/VoiceRecorder'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-)
-
 export default async function VoicePage({
   params,
 }: {
   params: Promise<{ token: string }>
 }) {
   const { token } = await params
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+  )
 
   const { data: project } = await supabase
     .from('projects')
