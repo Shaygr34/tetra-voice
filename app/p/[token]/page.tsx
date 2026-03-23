@@ -17,7 +17,7 @@ export default async function VoicePage({
 
   const { data: project, error } = await supabase
     .from('projects')
-    .select('id, name, slug, language')
+    .select('id, name, slug')
     .eq('token', token)
     .single()
 
